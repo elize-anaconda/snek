@@ -2,21 +2,57 @@ import {
   Component,
   ViewChild,
   AfterViewInit,
-  ElementRef
+  ElementRef,
+  HostListener
 } from '@angular/core';
 
 @Component({selector: 'app-snake', templateUrl: './snake.component.html', styleUrls: ['./snake.component.scss']})
 export class SnakeComponent implements AfterViewInit {
+  @HostListener('document:keydown', ['$event'])
+  changeDirection(event: KeyboardEvent) {
+    const LEFT_KEY = 37;
+    const RIGHT_KEY = 39;
+    const UP_KEY = 38;
+    const DOWN_KEY = 40;
+  
+    const keyPressed = event.keyCode;
+    const goingUp = this.dy === -10;
+    const goingDown = this.dy === 10;
+    const goingRight = this.dx === 10;  
+    const goingLeft = this.dx === -10;
+  
+      if (keyPressed === LEFT_KEY && !goingRight) { 
+           this.dx = -10;
+           this.dy = 0;  
+      } else if (keyPressed === UP_KEY && !goingDown) {    
+           this.dx = 0;
+           this.dy = -10;
+      } else if (keyPressed === RIGHT_KEY && !goingLeft) {    
+           this.dx = 10;
+           this.dy = 0;
+      } else if (keyPressed === DOWN_KEY && !goingUp) {    
+           this.dx = 0;
+           this.dy = 10;
+      }
+  }
 
-  @ViewChild('canvas', { static: true })
-  canvas: ElementRef<HTMLCanvasElement>; 
+  private canvas;
 
   public board_border = 'black';
   public board_background = "white";
   public snake_col = 'lightblue';
   public snake_border = 'darkblue';
 
-  private snakeboard_ctx : CanvasRenderingContext2D;
+  private context : CanvasRenderingContext2D;
+
+  // True if changing direction
+  public changing_direction = false;
+  // Horizontal velocity
+  public food_x;
+  public food_y;
+  public dx = 10;
+  // Vertical velocity
+  public dy = 0;
 
   public snake = [
     {
@@ -37,49 +73,65 @@ export class SnakeComponent implements AfterViewInit {
     }
   ]
 
+
   ngAfterViewInit() {
-    // Return a two dimensional drawing snakeboard_ctx
-    const el = this.canvas.nativeElement;
+    // Return a two dimensional drawing context
+    this.canvas = document.getElementById("snakeboard") as HTMLCanvasElement;
 
-    console.log(el);
+    this.context = this.canvas.getContext('2d');
 
-    this.clearCanvas(el.getContext('2d'));
-    this.drawSnake(el.getContext('2d'));
+    this.clearCanvas();
+    this.drawSnake();
 
+    this.startGame();
   }
 
   // draw a border around the canvas
-  private clearCanvas(context): void {
-    console.log(context);
+  private clearCanvas(): void {
     //  Select the colour to fill the drawing
-   context.fillStyle = this.board_background;
+   this.context.fillStyle = this.board_background;
     //  Select the colour for the border of the canvas
-   context.strokeStyle = this.board_border;
+   this.context.strokeStyle = this.board_border;
     // Draw a "filled" rectangle to cover the entire canvas
-   context.fillRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
+   this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
     // Draw a "border" around the entire canvas
-   context.strokeRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
+   this.context.strokeRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   // Draw the snake on the canvas
-  private drawSnake(context): void {
+  private drawSnake(): void {
     // Draw each part
-    this.snake.forEach(part => this.drawSnakePart(part, context));
+    this.snake.forEach(part => this.drawSnakePart(part));
   }
 
   // Draw one snake part
-  private drawSnakePart(snakePart : any, context): void {
-    console.log(context);
-
+  private drawSnakePart(snakePart : any): void {
     // Set the colour of the snake part
-    context.fillStyle = this.snake_col;
+    this.context.fillStyle = this.snake_col;
     // Set the border colour of the snake part
-    context.strokeStyle = this.snake_border;
+    this.context.strokeStyle = this.snake_border;
     // Draw a "filled" rectangle to represent the snake part at the coordinates the
     // part is located
-    context.fillRect(snakePart.x, snakePart.y, 10, 10);
+    this.context.fillRect(snakePart.x, snakePart.y, 10, 10);
     // Draw a border around the snake part
-    context.strokeRect(snakePart.x, snakePart.y, 10, 10);
+    this.context.strokeRect(snakePart.x, snakePart.y, 10, 10);
+  }
+
+  private moveSnake(): void{  
+    const head = {x: this.snake[0].x + this.dx, y: this.snake[0].y + this.dy};
+    this.snake.unshift(head);
+    this.snake.pop();
+  }
+
+  private startGame(): void {
+    setTimeout(() => 
+    {    
+      this.clearCanvas();    
+      this.moveSnake();  
+      this.drawSnake();
+      // Call main again
+      this.startGame();
+    }, 100)
   }
 
 }
