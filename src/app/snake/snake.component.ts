@@ -54,6 +54,8 @@ export class SnakeComponent implements AfterViewInit {
   // Vertical velocity
   public dy = 0;
 
+  public score: number = 0;
+
   public snake = [
     {
       x: 200,
@@ -83,6 +85,8 @@ export class SnakeComponent implements AfterViewInit {
     this.clearCanvas();
     this.drawSnake();
 
+    this.feedSnake();
+  
     this.startGame();
   }
 
@@ -118,20 +122,70 @@ export class SnakeComponent implements AfterViewInit {
   }
 
   private moveSnake(): void{  
+    // Create the new Snake's head
     const head = {x: this.snake[0].x + this.dx, y: this.snake[0].y + this.dy};
+    // Add the new head to the beginning of this.snake body
     this.snake.unshift(head);
-    this.snake.pop();
+    const has_eaten_food = this.snake[0].x === this.food_x && this.snake[0].y === this.food_y;
+    if (has_eaten_food) {
+      this.score += 10;
+      // Generate new food location
+      this.feedSnake();
+    } else {
+      // Remove the last part of this.snake body
+      this.snake.pop();
+    }
   }
 
   private startGame(): void {
     setTimeout(() => 
-    {    
-      this.clearCanvas();    
-      this.moveSnake();  
-      this.drawSnake();
-      // Call main again
-      this.startGame();
+    {
+      if (!this.hasGameEnded()) {
+        this.clearCanvas();    
+        this.moveSnake();  
+
+        this.drawSnake();
+        this.drawFood();
+
+        // Call main again
+        this.startGame();
+      }
     }, 100)
+  }
+
+  private hasGameEnded(): boolean {  
+    for (let i = 4; i < this.snake.length; i++)
+    {    
+      const has_collided = this.snake[i].x === this.snake[0].x && this.snake[i].y === this.snake[0].y
+      if (has_collided) 
+        return true
+    }
+    const hitLeftWall = this.snake[0].x < 0;  
+    const hitRightWall = this.snake[0].x > this.canvas.width - 10;
+    const hitToptWall = this.snake[0].y < 0;
+    const hitBottomWall = this.snake[0].y > this.canvas.height - 10;
+  
+    return hitLeftWall ||  hitRightWall || hitToptWall || hitBottomWall
+  }
+
+  private randomFood(min, max): number {
+    return Math.round((Math.random() * (max-min) + min) / 10) * 10;
+  }
+
+  private feedSnake() {
+    this.food_x = this.randomFood(0, this.canvas.width - 10);
+    this.food_y = this.randomFood(0, this.canvas.height - 10);
+    this.snake.forEach((part) => {
+         const has_eaten = part.x === this.food_x && part.y === this.food_y;
+         if (has_eaten) this.feedSnake();
+       });
+  }
+
+  private drawFood(): void {
+      this.context.fillStyle = 'lightgreen';
+      this.context.strokeStyle = 'darkgreen';
+      this.context.fillRect(this.food_x, this.food_y, 10, 10);
+      this.context.strokeRect(this.food_x, this.food_y, 10, 10);
   }
 
 }
