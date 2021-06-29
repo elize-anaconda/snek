@@ -6,4 +6,6 @@
         </p>
     </div>
     <canvas id="snakeboard" #canvas width="400" height="400"></canvas>
+    <div class="overlay" *ngIf="showOverlay"></div>
+    <h3 class="countdown" *ngIf="countdown !== ''"> {{countdown}} </h3>
 </div>
