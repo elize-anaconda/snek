@@ -1,8 +1,6 @@
 import {
   Component,
-  ViewChild,
   AfterViewInit,
-  ElementRef,
   HostListener
 } from '@angular/core';
 
