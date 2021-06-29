@@ -92,6 +92,8 @@ export class SnakeComponent implements AfterViewInit {
     public startPlay(): void {
         this.score = 0;
         this.snake = [...SNAKE_START_POSITION];
+        this.dy = 0;
+        this.dx = 10;
 
         this.replay = false;
 
