@@ -8,4 +8,6 @@
     <canvas id="snakeboard" #canvas width="400" height="400"></canvas>
     <div class="overlay" *ngIf="showOverlay"></div>
     <h3 class="countdown" *ngIf="countdown !== ''"> {{countdown}} </h3>
+
+    <button class="btn btn-light replay" *ngIf="replay" (click)="startPlay()">Play Again</button>
 </div>

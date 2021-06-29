@@ -6,6 +6,25 @@ import {
 import { interval } from 'rxjs';
 import { map } from 'rxjs/operators'
 
+const SNAKE_START_POSITION = [
+    {
+        x: 200,
+        y: 200
+    }, {
+        x: 190,
+        y: 200
+    }, {
+        x: 180,
+        y: 200
+    }, {
+        x: 170,
+        y: 200
+    }, {
+        x: 160,
+        y: 200
+    }
+];
+
 @Component({ selector: 'app-snake', templateUrl: './snake.component.html', styleUrls: ['./snake.component.scss'] })
 export class SnakeComponent implements AfterViewInit {
     @HostListener('document:keydown', ['$event'])
@@ -45,6 +64,7 @@ export class SnakeComponent implements AfterViewInit {
 
     public showOverlay: boolean = true;
     public countdown: string = "";
+    public replay: boolean = false;
 
     private context: CanvasRenderingContext2D;
 
@@ -57,24 +77,7 @@ export class SnakeComponent implements AfterViewInit {
 
     public score: number = 0;
 
-    public snake = [
-        {
-            x: 200,
-            y: 200
-        }, {
-            x: 190,
-            y: 200
-        }, {
-            x: 180,
-            y: 200
-        }, {
-            x: 170,
-            y: 200
-        }, {
-            x: 160,
-            y: 200
-        }
-    ]
+    public snake = [...SNAKE_START_POSITION];
 
 
     ngAfterViewInit() {
@@ -82,6 +85,15 @@ export class SnakeComponent implements AfterViewInit {
         this.canvas = document.getElementById("snakeboard") as HTMLCanvasElement;
 
         this.context = this.canvas.getContext('2d');
+
+        this.startPlay();
+    }
+
+    public startPlay(): void {
+        this.score = 0;
+        this.snake = [...SNAKE_START_POSITION];
+
+        this.replay = false;
 
         this.clearCanvas();
         this.drawSnake();
@@ -166,6 +178,9 @@ export class SnakeComponent implements AfterViewInit {
 
                 // Call main again
                 this.startGame();
+            } else {
+                this.showOverlay = true;
+                this.replay = true;
             }
         }, 100)
     }
