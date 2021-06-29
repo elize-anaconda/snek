@@ -57,9 +57,9 @@ export class SnakeComponent implements AfterViewInit {
 
     private canvas;
 
-    public board_border = 'black';
-    public board_background = "white";
-    public snake_col = 'lightblue';
+    public board_border = '#102443';
+    public board_background = "#102443";
+    public snake_col = '#e1f1f1';
     public snake_border = 'darkblue';
 
     public showOverlay: boolean = true;
@@ -215,7 +215,7 @@ export class SnakeComponent implements AfterViewInit {
     }
 
     private drawFood(): void {
-        this.context.fillStyle = 'lightgreen';
+        this.context.fillStyle = '#5ba641';
         this.context.strokeStyle = 'darkgreen';
         this.context.fillRect(this.food_x, this.food_y, 10, 10);
         this.context.strokeRect(this.food_x, this.food_y, 10, 10);
